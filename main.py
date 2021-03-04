@@ -1,5 +1,6 @@
 import requests
 from flask import Flask, render_template, request
+from bs4 import BeautifulSoup
 
 """
 When you try to scrape reddit make sure to send the 'headers' on your request.
@@ -34,6 +35,49 @@ subreddits = [
 
 
 app = Flask("DayEleven")
+
+post = []
+
+@app.route("/")
+def home():
+  return render_template("home.html", subreddits = subreddits)
+
+@app.route("/read")
+def read():
+  redit=[]
+  for subreddit in subreddits:
+    on = request.args.get(subreddit)
+    if on == 'on':
+      redit.append(subreddit)
+      url = f"https://www.reddit.com/r/{subreddit}/top/?t=month"
+
+      result = requests.get(url, headers = headers)
+      soup = BeautifulSoup(result.text, "html.parser")
+      items = soup.find_all("div", {"class": "Post"})
+
+      for item in items:
+        title = item.find("h3").text
+        url= item.find("a")
+        url_text = f"{url['href']}"
+        upvotes_span = item.find("span", {"class", "D6SuXeSnAAagG8dKAb4O4"})
+        if upvotes_span == None :
+          upvotes = "vote"
+        else : 
+          upvotes = upvotes_span.text
+        post.append(
+          {
+            "title": title,
+            "url": url_text,
+            "upvotes": upvotes,
+            "category": subreddit,
+          }
+        )
+
+  return  render_template("read.html", 
+      subreddits=subreddits,
+      on=on,
+      post=post
+    )
 
 
 app.run(host="0.0.0.0")

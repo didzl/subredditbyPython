@@ -14,10 +14,10 @@
     <h3>Reading: {% for subreddit in selected%}r/{{subreddit}}  {% endfor %} </h3>
   </header>
   <main>
-    {% for post in posts %}
+    {% for p in post %}
       <div>
-          <h3><a href="https://reddit.com{{post.link}}" target="_blank">{{post.title}}</a></h3>
-          <h4>{{post.votes}} upvotes ·  r/{{post.subreddit}}</h4>
+          <h3><a href="https://reddit.com{{post.link}}" target="_blank">{{p.title}}</a></h3>
+          <h4>{{p.votes}} upvotes ·  r/{{p.subreddit}}</h4>
         <hr />
       </div>
     {% endfor %}
